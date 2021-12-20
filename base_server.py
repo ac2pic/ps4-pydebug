@@ -28,6 +28,16 @@ class Processes():
     def add(self, entry):
         self.procList.append(entry)
 
+    def findByName(self, name, offset = 0):
+        encounterTracker = 0
+        for process in self:
+            if process.name == name:
+                if encounterTracker == offset:
+                    return process
+                else:
+                    encounterTracker += 1
+        return None
+
     def __iter__(self):
         return iter(self.procList)
 
@@ -48,6 +58,16 @@ class ProcessMap():
 
     def add(self, entry):
         self.maps.append(entry)
+
+    def findByName(self, name, offset = 0):
+        encounterTracker = 0
+        for procMap in self:
+            if procMap.name == name:
+                if encounterTracker == offset:
+                    return procMap
+                else:
+                    encounterTracker += 1
+        return None
 
     def __iter__(self):
         return iter(self.maps)
