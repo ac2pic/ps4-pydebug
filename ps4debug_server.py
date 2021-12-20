@@ -11,8 +11,8 @@ ProcessMapEntrySize = 32 + 8 * 3 + 2
 
 CMD = {
     "CMD_PROC_LIST": 0xBDAA0001,
-    # CMD_PROC_READ": 0xBDAA0002,
-    # CMD_PROC_WRITE: 0xBDAA0003,
+    "CMD_PROC_READ": 0xBDAA0002,
+    "CMD_PROC_WRITE": 0xBDAA0003,
     "CMD_PROC_MAPS": 0xBDAA0004,
     # CMD_PROC_INSTALL: 0xBDAA0005,
     # CMD_PROC_CALL: 0xBDAA0006,
@@ -47,7 +47,7 @@ class PS4DebugServer(BaseServer):
     def checkSuccess(self):
         status = int.from_bytes(self.socket.recv(4, socket.MSG_WAITALL), "little")
         if status != CMD_STATUS["SUCCESS"]:
-            raise ServerException(status)
+            raise ServerException('Check failed {}'.format(hex(status)))
 
     def sendCMDPacket(self, cmdNumber, length, fieldBuffer = None, checkForSuccess = True):
         packet = createCmdPacket(cmdNumber, length)
@@ -88,5 +88,22 @@ class PS4DebugServer(BaseServer):
             end = struct.unpack_from("<Q", procMapBuffer, offset + 40)[0]
             off = struct.unpack_from("<Q", procMapBuffer, offset + 48)[0]
             prot = struct.unpack_from("<H", procMapBuffer, offset + 56)[0]
-            procMap.append(ProcessMapEntry(name, start, end, off, prot))
+            procMap.append(ProcessMapEntry(pid, name, start, end, off, prot))
         return ProcessMap(procMap)
+
+    def readMemory(self, pid, start, length):
+        fieldBuffer = pid.to_bytes(4, byteorder='little')
+        fieldBuffer += start.to_bytes(8, byteorder='little')
+        fieldBuffer += length.to_bytes(4, byteorder='little')
+        self.sendCMDPacket(CMD["CMD_PROC_READ"], 16, fieldBuffer)
+        return self.socket.recv(length, socket.MSG_WAITALL)
+
+    def writeMemory(self, pid, start, buffer = b''):
+        if len(buffer) == 0:
+            return
+        fieldBuffer = pid.to_bytes(4, byteorder='little')
+        fieldBuffer += start.to_bytes(8, byteorder='little')
+        fieldBuffer += len(buffer).to_bytes(4, byteorder='little')
+        self.sendCMDPacket(CMD["CMD_PROC_WRITE"], 16, fieldBuffer)
+        self.socket.sendall(buffer)
+        self.checkSuccess()

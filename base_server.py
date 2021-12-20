@@ -12,8 +12,12 @@ class BaseServer():
     def getProcessList(self):
         raise 'Not Implemented'
 
-    def readBytes(self, address = 0, size = 0):
+    def readMemory(self, readable = None, address = 0, size = 0):
         raise 'Not Implemented'
+    
+    def writeMemory(self, writable = None, address = 0, buffer = b''):
+        raise 'Not Implemented'
+
 
 # Types
 
@@ -23,6 +27,9 @@ class Processes():
     
     def add(self, entry):
         self.procList.append(entry)
+
+    def __iter__(self):
+        return iter(self.procList)
 
     def __str__(self):
         return '\n'.join([str(entry) for entry in self.procList])
@@ -42,17 +49,20 @@ class ProcessMap():
     def add(self, entry):
         self.maps.append(entry)
 
+    def __iter__(self):
+        return iter(self.maps)
+
     def __str__(self):
         return '\n'.join([str(entry) for entry in self.maps])
 
 class ProcessMapEntry():
-    def __init__(self, name, start, end, offset, prot):
+    def __init__(self, pid, name, start, end, offset, prot):
+        self.pid = pid
         self.name = name 
         self.start = start
         self.end = end 
         self.offset = offset
         self.prot = prot
-
     def __str__(self) -> str:
         return "{} - start={} end={} offset={} prot={}".format(self.name, hex(self.start), hex(self.end), hex(self.offset), self.prot)
 
@@ -61,3 +71,5 @@ class ProcessMapEntry():
 class ServerException(Exception):
     pass
 
+class ExitException(Exception):
+    pass
