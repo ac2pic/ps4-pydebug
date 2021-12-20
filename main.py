@@ -55,6 +55,14 @@ def get_process_list():
         return None
     return server.getProcessList()
 
+def execute_custom_code(scriptPath = ''):
+    # This is going to be fun trying to catch every single error
+    # Should probably let execute catch errors... or not
+    scriptLines = None
+    with open('{}.gr'.format(scriptPath), 'r') as scriptFile:
+        scriptLines = scriptFile.read()
+    return execute(scriptLines, predef_globals, session_locals)
+
 predef_globals = {
     "__builtins__": {},
     "quit": quit,
@@ -63,6 +71,7 @@ predef_globals = {
     "processlist": get_process_list,
     "pls": get_process_list, # alias
     "pmap": get_process_map, # alias
+    "exec": execute_custom_code, 
 }
 
 should_exit = False
