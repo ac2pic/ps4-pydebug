@@ -21,6 +21,15 @@ class BaseServer():
 
 # Types
 
+class ProcessEntry():
+    def __init__(self, name: str, pid: int):
+        self.name = name 
+        self.pid = pid
+
+    def __str__(self) -> str:
+        return "{} - {}".format(self.name, self.pid)
+
+
 class Processes():
     def __init__(self, procList = []):
         self.procList = procList
@@ -28,7 +37,7 @@ class Processes():
     def add(self, entry):
         self.procList.append(entry)
 
-    def findByName(self, name, offset = 0):
+    def findByName(self, name, offset = 0) -> ProcessEntry or None:
         encounterTracker = 0
         for process in self:
             if process.name == name:
@@ -44,37 +53,6 @@ class Processes():
     def __str__(self):
         return '\n'.join([str(entry) for entry in self.procList])
 
-class ProcessEntry():
-    def __init__(self, name, pid):
-        self.name = name 
-        self.pid = pid
-
-    def __str__(self) -> str:
-        return "{} - {}".format(self.name, self.pid)
-
-class ProcessMap():
-    def __init__(self, maps = []):
-        self.maps = maps
-
-    def add(self, entry):
-        self.maps.append(entry)
-
-    def findByName(self, name, offset = 0):
-        encounterTracker = 0
-        for procMap in self:
-            if procMap.name == name:
-                if encounterTracker == offset:
-                    return procMap
-                else:
-                    encounterTracker += 1
-        return None
-
-    def __iter__(self):
-        return iter(self.maps)
-
-    def __str__(self):
-        return '\n'.join([str(entry) for entry in self.maps])
-
 class ProcessMapEntry():
     def __init__(self, pid, name, start, end, offset, prot):
         self.pid = pid
@@ -85,6 +63,36 @@ class ProcessMapEntry():
         self.prot = prot
     def __str__(self) -> str:
         return "{} - start={} end={} offset={} prot={}".format(self.name, hex(self.start), hex(self.end), hex(self.offset), self.prot)
+
+
+class ProcessMap():
+    def __init__(self, maps = []):
+        self.maps = maps
+
+    def add(self, entry):
+        self.maps.append(entry)
+ 
+    def find(self, name = '', prot = -1) -> ProcessMapEntry or None:
+        foundMaps = []
+        foundMap = None
+        for procMap in self:
+            if procMap.name == name:
+                foundMaps.append(procMap)
+        if prot > -1:
+            for procMap in foundMaps:
+                if (procMap.prot & prot) == prot:
+                    foundMap = procMap
+                    break
+        else:
+            foundMap = foundMaps[0] 
+        return foundMap
+
+    def __iter__(self):
+        return iter(self.maps)
+
+    def __str__(self):
+        return '\n'.join([str(entry) for entry in self.maps])
+
 
 # Exceptions
 
