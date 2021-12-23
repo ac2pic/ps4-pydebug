@@ -1,12 +1,18 @@
+
+# Types
+
 class BaseServer():
     def __init__(self):
         self.is_connected = False
         pass
 
-    def connect(self):
+    def connect(self) -> bool:
         raise 'Not Implemented'
 
-    def getProcessMaps(self):
+    def getFirmware(self):
+        raise 'Not Implemented'
+
+    def getProcessMaps(self, pid: int):
         raise 'Not Implemented'
     
     def getProcessList(self):
@@ -19,12 +25,15 @@ class BaseServer():
         raise 'Not Implemented'
 
 
-# Types
 
 class ProcessEntry():
-    def __init__(self, name: str, pid: int):
+    def __init__(self, name: str, pid: int, server: BaseServer):
         self.name = name 
         self.pid = pid
+        self.server = server
+
+    def getProcessMaps(self):
+        return self.server.getProcessMaps(self.pid)
 
     def __str__(self) -> str:
         return "{} - {}".format(self.name, self.pid)

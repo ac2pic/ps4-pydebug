@@ -1,12 +1,10 @@
 from script_stub import *
+
 def trackPatch(readable, address, length, buffer):
     print('Before patch', pread(readable, address, length))
     pwrite(readable, address, buffer)
     print('After patch', pread(readable, address, length))
 
-connect("ps4debug", "10.0.0.5", 744)
-if not connected:
-    quit()
 procList = plist()
 # libSceSaveData patches
 libSceSaveData_offsets =  [

@@ -20,7 +20,7 @@ CMD = {
     # CMD_PROC_FREE: 0xBDAA000C,
     # // extended
     # CMD_GET_DBG_BASE_VERSION: 0xBD000001,
-    # CMD_GET_PS4_FW: 0xBD000500,
+    "CMD_GET_PS4_FW": 0xBD000500,
     # CMD_GET_DBG_EXT_VERSION: 0xBD000501,
 }
 
@@ -58,9 +58,16 @@ class PS4DebugServer(BaseServer):
             self.checkSuccess()
 
     def connect(self, host, port):
-        self.socket.connect((host, port))
-        self.is_connected = True
-
+        try:
+            self.socket.connect((host, port))
+            self.is_connected = True
+        except OSError:
+            return False
+        return True
+    def getFirmware(self):
+        self.sendCMDPacket(CMD["CMD_GET_PS4_FW"], 0, checkForSuccess=False)
+        return int.from_bytes(self.socket.recv(2, socket.MSG_WAITALL), "little")
+        
     def getProcessList(self):
         self.sendCMDPacket(CMD["CMD_PROC_LIST"], 0)
         procCount = int.from_bytes(self.socket.recv(4, socket.MSG_WAITALL), "little")
@@ -70,7 +77,7 @@ class PS4DebugServer(BaseServer):
             offset = i * ProcessListEntrySize
             procName = readCString(procListBuffer[offset:offset+32], "ascii")
             procPid = struct.unpack_from("<I", procListBuffer, offset+32)[0]
-            procList.append(ProcessEntry(procName, procPid))
+            procList.append(ProcessEntry(procName, procPid, self))
         return Processes(procList)
 
     def getProcessMaps(self, pid):

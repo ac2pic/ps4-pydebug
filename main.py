@@ -2,7 +2,7 @@ import ast
 from base_server import BaseServer, ExitException, ServerException
 from ps4debug_server import PS4DebugServer
 
-def execute(code, predef_globals, session_locals = {}):
+def execute(code, predef_globals, session_locals):
     code_ast = ast.parse(code)
     nodes = ast.iter_child_nodes(code_ast)
     statements = list(nodes)
@@ -29,19 +29,22 @@ server = None
 def connect(name = "", host = "", port = 0):
     global server
     if server != None:
-        print("Must disconnect from server first!")
-        return
+        sock_host, sock_port = server.socket.getpeername()
+        if sock_host != host or sock_port != port:
+            print("Must disconnect from server first!")
+            return False
+        return True
     if name != "ps4debug":
         print("Invalid server specified.")
-        return 
+        return False
     server = PS4DebugServer()
-    try:
-        server.connect(host, port)
-        session_locals["connected"] = True
-    except OSError as e:
-        print(str(e))
-        server = None
-        session_locals["connected"] = False
+    return server.connect(host, port)
+
+def get_ps4_fw():
+    if server == None:
+        print("Not connected to a server")
+        return 0
+    return server.getFirmware()
 
 def get_process_map(pid = -100000):
     if server == None:
@@ -93,7 +96,9 @@ def display(*args, **kwargs):
 predef_globals = {
     "__builtins__": {
         "hex": hex,
+        "locals": locals,
     },
+    "firmware": get_ps4_fw,
     "apply_patches": execute_patches,
     "quit": exec_exit,
     "connect": connect,
@@ -105,7 +110,9 @@ predef_globals = {
     "print": display,
 }
 
-session_locals = {}
+session_locals = {
+    "connected": False
+}
 while True:
     user_cmd = input("> ")
     try:

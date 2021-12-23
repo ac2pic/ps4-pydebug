@@ -9,6 +9,9 @@ class ProcessEntry():
     def __str__(self) -> str:
         return "{} - {}".format(self.name, self.pid)
 
+    def getProcessMaps(self) -> ProcessMap:
+        pass
+
 
 class Processes():
     def __init__(self, procList: list[ProcessEntry] = []):
@@ -54,7 +57,16 @@ class ProcessMap():
 def connect(name = "", host = "", port = 0) -> None:
     pass
 
+def firmware() -> int:
+    """
+    Returns PS4 firmware as a number. Ex: 505
+    """
+    pass
+
 def plist() -> Processes:
+    """
+    Lists current PS4 firmware as a number. Ex: 505
+    """
     pass
 
 def pmap(pid: int = -100000) -> ProcessMap or None:
