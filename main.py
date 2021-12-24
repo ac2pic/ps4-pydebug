@@ -26,6 +26,10 @@ def execute(code, predef_globals, session_locals):
 
 server = None
 
+backends = {
+    "ps4debug": PS4DebugServer
+}
+
 def connect(name = "", host = "", port = 0):
     global server
     if server != None:
@@ -34,11 +38,14 @@ def connect(name = "", host = "", port = 0):
             print("Must disconnect from server first!")
             return False
         return True
-    if name != "ps4debug":
-        print("Invalid server specified.")
+    if backends.get(name, None) == None:
+        print("Invalid backend specified.")
         return False
-    server = PS4DebugServer()
-    return server.connect(host, port)
+    server = backends[name]()
+    if not server.connect(host, port):
+        server = None
+        return False
+    return True
 
 def get_ps4_fw():
     if server == None:
