@@ -8,9 +8,11 @@ def trackPatch(readable, address, length, buffer):
 procList = plist()
 # libSceSaveData patches
 libSceSaveData_offsets =  [
-    0x035da8,
-    0x034609,
     0xFA1,
+    0x034679,
+    0x034609,
+    0x035da8,
+    0x036256,
 ]
 
 shellUi = procList.findByName("SceShellUI")
