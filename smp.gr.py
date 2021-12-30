@@ -1,6 +1,8 @@
 from script_stub import *
-
-if not connect("ps4debug", "10.0.0.4", 744):
+ip = "10.0.0.5"
+port = 744
+print('Trying to connect to {}:{}'.format(ip, port))
+if not connect("ps4debug", ip, port):
     print('Could not connect')
     quit()
 

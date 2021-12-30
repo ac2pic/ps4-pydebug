@@ -38,6 +38,7 @@ class ProcessMapEntry():
 
 class ProcessMap():
     def __init__(self, maps: list[ProcessMapEntry] = []):
+        self.maps = maps
         pass
 
     def add(self, entry: ProcessMapEntry):
@@ -53,6 +54,9 @@ class ProcessMap():
         pass
 
 
+
+def exec(scriptPath = '', inheritLocals: bool = True):
+    pass
 
 def connect(name = "", host = "", port = 0) -> None:
     pass

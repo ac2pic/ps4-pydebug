@@ -68,7 +68,7 @@ def get_process_list():
         return None
     return server.getProcessList()
 
-def execute_custom_code(scriptPath = ''):
+def execute_custom_code(scriptPath = '', inheritLocals = True):
     # This is going to be fun trying to catch every single error
     # Should probably let execute catch errors... or not
     scriptLines = None
