@@ -10,7 +10,6 @@ procList = plist()
 libSceSaveData_offsets =  [
     0x32998,
     0x31699,
-    0x01119,
 ]
 
 shellUi = procList.findByName("SceShellUI")
@@ -21,6 +20,8 @@ if libSceSaveData == None:
     quit()
 for offset in libSceSaveData_offsets:
     trackPatch(libSceSaveData, offset, 10, b'\x00')
+
+trackPatch(libSceSaveData, 0x01119, 1, b'\x1F')
 
 shellCore = procList.findByName("SceShellCore")
 if shellCore == None:

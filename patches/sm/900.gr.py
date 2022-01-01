@@ -22,7 +22,7 @@ if libSceSaveData == None:
     quit()
 for offset in libSceSaveData_offsets:
     trackPatch(libSceSaveData, offset, 10, b'\x00')
-
+trackPatch(libSceSaveData, 0x0FA1, 1, b'\x1F')
 # shellCore = procList.findByName("SceShellCore")
 # if shellCore == None:
 #     print("Could not find SceShellCore")
