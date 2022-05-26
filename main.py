@@ -1,3 +1,4 @@
+import argparse
 import ast
 from base_server import BaseServer, ExitException, ServerException
 from ps4debug_server import PS4DebugServer
@@ -120,6 +121,19 @@ predef_globals = {
 session_locals = {
     "connected": False
 }
+
+parser = argparse.ArgumentParser(description='Do stuff')
+
+parser.add_argument('-e', '--execute', help='Execute some instructions and exit.')
+
+args = parser.parse_args()
+
+if args.execute:
+    result = execute(args.execute, predef_globals, session_locals)
+    if result != None:
+        print(result)
+    exit(0)
+
 while True:
     user_cmd = input("> ")
     try:
